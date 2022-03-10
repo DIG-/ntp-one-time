@@ -32,6 +32,7 @@ for option, value in options:
         increment = int(value)
 
 client = NTPClient()
+started = time()
 for i in range(1, repeat):
     print(f"Try {i}")
     for server in server_list:
@@ -48,7 +49,8 @@ for i in range(1, repeat):
             exit(0)
         new_time = int(time() + stats.offset)
         print(f"Adjust time to: {ctime(new_time)}")
-        update_system_time(new_time)
+
+        update_system_time(new_time, abs(stats.offset) > (24 * 60 * 60), (time() - started) < 90)
         exit(0)
     print(f"Wait {delay} seconds")
     sleep(delay)
