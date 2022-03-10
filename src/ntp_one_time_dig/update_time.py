@@ -1,3 +1,4 @@
+from subprocess import run
 from sys import platform
 
 
@@ -8,17 +9,24 @@ def _update_system_time_linux(value: int, restart: bool, restart_now: bool):
 def _update_system_time_windows(value: int, restart: bool, restart_now: bool):
     from datetime import datetime
 
-    from win32api import InitiateSystemShutdown, SetSystemTime
+    from win32api import SetSystemTime
 
     utc = datetime.utcfromtimestamp(value)
     SetSystemTime(utc.year, utc.month, utc.weekday(), utc.day, utc.hour, utc.minute, utc.second, 0)
     if restart:
-        InitiateSystemShutdown(
-            None,
-            "Restarting computer to apply new date and time. Save everything.",
-            0 if restart_now else 90,
-            True,
-            True,
+        run(
+            " ".join(
+                (
+                    "shutdown",
+                    "/r",
+                    "/f",
+                    "/t",
+                    "0" if restart_now else "90",
+                    "/c",
+                    '"Restarting computer to apply new date and time. Save everything."',
+                )
+            ),
+            shell=True,
         )
         pass
 
